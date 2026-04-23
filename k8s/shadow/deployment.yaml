@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aceest-fitness-primary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aceest-fitness
+      track: primary
+  template:
+    metadata:
+      labels:
+        app: aceest-fitness
+        track: primary
+    spec:
+      containers:
+        - name: aceest-fitness
+          image: your-dockerhub-user/aceest-fitness-gym:v1
+          ports:
+            - containerPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aceest-fitness-shadow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aceest-fitness
+      track: shadow
+  template:
+    metadata:
+      labels:
+        app: aceest-fitness
+        track: shadow
+    spec:
+      containers:
+        - name: aceest-fitness
+          image: your-dockerhub-user/aceest-fitness-gym:v2
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aceest-fitness-primary-service
+spec:
+  selector:
+    app: aceest-fitness
+    track: primary
+  ports:
+    - port: 80
+      targetPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aceest-fitness-shadow-service
+spec:
+  selector:
+    app: aceest-fitness
+    track: shadow
+  ports:
+    - port: 80
+      targetPort: 5000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aceest-fitness-shadow-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/mirror-target: http://aceest-fitness-shadow-service.default.svc.cluster.local$request_uri
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: aceest.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: aceest-fitness-primary-service
+                port:
+                  number: 80
