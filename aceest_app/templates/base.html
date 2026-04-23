@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}ACEest Fitness{% endblock %}</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f1e8;
+        --surface: #fffdf8;
+        --ink: #1d1a16;
+        --muted: #6d6458;
+        --accent: #cb5f34;
+        --accent-dark: #8e3310;
+        --line: #decfb9;
+        --success: #2b7a3d;
+        --error: #9b2226;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background:
+          radial-gradient(circle at top right, rgba(203, 95, 52, 0.16), transparent 25rem),
+          linear-gradient(180deg, #efe6d6 0%, var(--bg) 40%, #f8f5ef 100%);
+        color: var(--ink);
+      }
+      a { color: inherit; }
+      .shell { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+      .hero {
+        background: linear-gradient(135deg, rgba(255,255,255,0.86), rgba(255,248,240,0.95));
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(76, 53, 32, 0.08);
+      }
+      .hero h1, .panel h2, .panel h3 { margin-top: 0; }
+      .hero p { max-width: 48rem; line-height: 1.6; color: var(--muted); }
+      .grid { display: grid; gap: 1.25rem; }
+      .grid-3 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+      .grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 1.25rem;
+      }
+      .metric { font-size: 2rem; font-weight: 700; margin: 0.4rem 0 0; }
+      .muted { color: var(--muted); }
+      .button, button {
+        background: var(--accent);
+        color: white;
+        border: 0;
+        border-radius: 999px;
+        padding: 0.8rem 1.15rem;
+        font: inherit;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .button.secondary {
+        background: transparent;
+        color: var(--accent-dark);
+        border: 1px solid var(--line);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        text-align: left;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--line);
+      }
+      form {
+        display: grid;
+        gap: 0.9rem;
+      }
+      label {
+        display: grid;
+        gap: 0.35rem;
+        font-weight: 600;
+      }
+      input, select, textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 0.8rem 0.95rem;
+        font: inherit;
+        background: white;
+      }
+      .flash-list {
+        display: grid;
+        gap: 0.75rem;
+        margin: 1rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .flash {
+        border-radius: 16px;
+        padding: 0.9rem 1rem;
+        border: 1px solid var(--line);
+        background: white;
+      }
+      .flash.success { border-color: rgba(43, 122, 61, 0.4); color: var(--success); }
+      .flash.error { border-color: rgba(155, 34, 38, 0.35); color: var(--error); }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flash-list">
+            {% for category, message in messages %}
+              <li class="flash {{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

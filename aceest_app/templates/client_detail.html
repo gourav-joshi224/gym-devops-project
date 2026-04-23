@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ client.name }}{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <p class="muted">Client profile</p>
+    <h1>{{ client.name }}</h1>
+    <p>
+      Program: <strong>{{ client.program or "Not assigned" }}</strong>
+      <br>
+      Membership: <strong>{{ client.membership_status or "Unknown" }}</strong>
+      <br>
+      Daily calories: <strong>{{ client.calories or "Not set" }}</strong>
+    </p>
+    <div class="actions">
+      <a class="button secondary" href="{{ url_for('core.home') }}">Back to dashboard</a>
+    </div>
+  </section>
+
+  <section class="grid grid-2" style="margin-top: 1.25rem;">
+    <article class="panel">
+      <h2>Log workout</h2>
+      <form method="post" action="{{ url_for('core.create_workout', client_id=client.id) }}">
+        <label>
+          Date
+          <input name="date" type="date" required>
+        </label>
+        <label>
+          Workout type
+          <select name="workout_type">
+            <option value="Strength">Strength</option>
+            <option value="Hypertrophy">Hypertrophy</option>
+            <option value="Cardio">Cardio</option>
+            <option value="Mobility">Mobility</option>
+          </select>
+        </label>
+        <label>
+          Duration in minutes
+          <input name="duration_min" type="number" min="1" max="300" required>
+        </label>
+        <label>
+          Notes
+          <textarea name="notes" rows="5" placeholder="Session notes"></textarea>
+        </label>
+        <button type="submit">Save workout</button>
+      </form>
+    </article>
+
+    <article class="panel">
+      <h2>Workout history</h2>
+      {% if workouts %}
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Duration</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for workout in workouts %}
+              <tr>
+                <td>{{ workout.date }}</td>
+                <td>{{ workout.workout_type }}</td>
+                <td>{{ workout.duration_min }} min</td>
+                <td>{{ workout.notes or "No notes" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted">No workouts logged for this client yet.</p>
+      {% endif %}
+    </article>
+  </section>
+{% endblock %}

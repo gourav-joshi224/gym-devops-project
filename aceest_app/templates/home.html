@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}ACEest Operations Dashboard{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <p class="muted">ACEest Fitness & Gym</p>
+    <h1>Gym operations dashboard built for CI/CD delivery.</h1>
+    <p>
+      This Flask version of ACEest tracks clients, memberships, nutrition plans, and workout logs
+      through a browser-ready workflow that can be tested, containerized, and deployed.
+    </p>
+    <div class="actions">
+      <a class="button" href="{{ url_for('core.create_client') }}">Register New Client</a>
+    </div>
+  </section>
+
+  <section class="grid grid-3" style="margin-top: 1.25rem;">
+    <article class="panel">
+      <p class="muted">Clients</p>
+      <p class="metric">{{ stats.clients }}</p>
+    </article>
+    <article class="panel">
+      <p class="muted">Active memberships</p>
+      <p class="metric">{{ stats.active_memberships }}</p>
+    </article>
+    <article class="panel">
+      <p class="muted">Logged workouts</p>
+      <p class="metric">{{ stats.workouts }}</p>
+    </article>
+  </section>
+
+  <section class="grid grid-2" style="margin-top: 1.25rem;">
+    <article class="panel">
+      <h2>Clients</h2>
+      {% if clients %}
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Program</th>
+              <th>Membership</th>
+              <th>Calories</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for client in clients %}
+              <tr>
+                <td><a href="{{ url_for('core.client_detail', client_id=client.id) }}">{{ client.name }}</a></td>
+                <td>{{ client.program or "Not assigned" }}</td>
+                <td>{{ client.membership_status or "Unknown" }}</td>
+                <td>{{ client.calories or "Not set" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted">No clients yet. Register the first member to start the workflow.</p>
+      {% endif %}
+    </article>
+
+    <article class="panel">
+      <h2>Recent workouts</h2>
+      {% if recent_workouts %}
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Client</th>
+              <th>Type</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for workout in recent_workouts %}
+              <tr>
+                <td>{{ workout.date }}</td>
+                <td>{{ workout.client_name }}</td>
+                <td>{{ workout.workout_type }}</td>
+                <td>{{ workout.duration_min }} min</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted">Workout activity will appear here after coaches log sessions.</p>
+      {% endif %}
+    </article>
+  </section>
+{% endblock %}

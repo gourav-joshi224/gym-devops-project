@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Not Found{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <p class="muted">ACEest Fitness & Gym</p>
+    <h1>Requested record was not found.</h1>
+    <div class="actions">
+      <a class="button secondary" href="{{ url_for('core.home') }}">Back to dashboard</a>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Register Client{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <p class="muted">Client onboarding</p>
+    <h1>Register a new ACEest client.</h1>
+    <p>Capture a minimal fitness profile so the client can be managed through the delivery pipeline demos.</p>
+  </section>
+
+  <section class="panel" style="margin-top: 1.25rem;">
+    <form method="post">
+      <label>
+        Client name
+        <input name="name" placeholder="e.g. Raghav Sharma" required>
+      </label>
+      <label>
+        Age
+        <input name="age" type="number" min="10" max="100">
+      </label>
+      <label>
+        Program
+        <select name="program">
+          <option value="Starter Plan">Starter Plan</option>
+          <option value="Fat Loss">Fat Loss</option>
+          <option value="Muscle Gain">Muscle Gain</option>
+          <option value="Performance">Performance</option>
+        </select>
+      </label>
+      <label>
+        Daily calories
+        <input name="calories" type="number" min="1000" max="6000">
+      </label>
+      <label>
+        Membership status
+        <select name="membership_status">
+          <option value="Active">Active</option>
+          <option value="Paused">Paused</option>
+          <option value="Expired">Expired</option>
+        </select>
+      </label>
+      <div class="actions">
+        <button type="submit">Create client</button>
+        <a class="button secondary" href="{{ url_for('core.home') }}">Back to dashboard</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}
