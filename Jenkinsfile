@@ -8,6 +8,7 @@ pipeline {
 
     environment {
         VENV_DIR = ".venv"
+        SONAR_SCANNER_HOME = tool 'sonar-scanner'
     }
 
     stages {
@@ -35,6 +36,25 @@ pipeline {
                     . ${VENV_DIR}/bin/activate
                     pytest -q --junitxml=pytest.xml
                 """
+            }
+        }
+
+        stage("Run SonarQube Analysis") {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        . ${VENV_DIR}/bin/activate
+                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner
+                    """
+                }
+            }
+        }
+
+        stage("Enforce Quality Gate") {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
