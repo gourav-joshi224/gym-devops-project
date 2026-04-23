@@ -1,193 +1,141 @@
-# 🏋️ Gym DevOps CI/CD Pipeline Project
+# ACEest Fitness & Gym DevOps Pipeline
 
----
+This repository contains the part 2 assignment implementation for ACEest Fitness & Gym. The project now uses a modular Flask web application backed by SQLite and is prepared for automated CI/CD delivery through Jenkins, SonarQube, Docker, and Kubernetes deployment strategies.
 
-## 📌 Project Overview
+## Current Application Scope
 
-This project demonstrates the implementation of **DevOps principles** by building a CI/CD pipeline for a simple **Flask-based Gym Management Application**.
+The web application covers the core gym-management flow needed for the assignment:
 
-The pipeline automates the following stages of the software delivery lifecycle:
+- dashboard with client and workout overview
+- client registration workflow
+- client profile page
+- workout logging per client
+- SQLite-backed persistence through a reusable Flask app factory
 
-- Pulling source code from GitHub
-- Installing dependencies
-- Running automated tests
-- Building a Docker container
-- Integrating with Jenkins for Continuous Integration
+## Project Structure
 
----
-
-## 🏗️ Pipeline Architecture
-
-```
-Developer
-    ↓
-GitHub Repository
-    ↓
-GitHub Actions (CI)
-    ↓
-Jenkins Server
-    ↓
-Install Dependencies
-    ↓
-Run Automated Tests (Pytest)
-    ↓
-Build Docker Image
-```
-
----
-
-## 📁 Project Structure
-
-```
+```text
 gym-devops-project/
-│
-├── app.py
-├── requirements.txt
-├── Dockerfile
-├── README.md
-│
+├── aceest_app/
+│   ├── __init__.py
+│   ├── db.py
+│   ├── routes.py
+│   ├── schema.sql
+│   └── templates/
 ├── tests/
 │   └── test_app.py
-│
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-│
-└── .gitignore
+├── k8s/
+│   ├── rolling/
+│   ├── blue-green/
+│   ├── canary/
+│   ├── shadow/
+│   └── ab-testing/
+├── Jenkinsfile
+├── Dockerfile
+├── sonar-project.properties
+├── requirements.txt
+└── app.py
 ```
 
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Python 3.12+
-- Docker
-- Jenkins (optional, for full CI pipeline)
-
----
-
-## 📦 Step 1 — Clone the Repository
-
-```bash
-git clone https://github.com/your-username/gym-devops-project.git
-cd gym-devops-project
-```
-
----
-
-## 📦 Step 2 — Dependency Management
-
-**`requirements.txt`**
-```
-flask
-pytest
-```
+## Local Development
 
 Install dependencies:
+
 ```bash
+python3 -m venv .venv
+. .venv/bin/activate
 pip install -r requirements.txt
 ```
 
----
+Run the Flask application:
 
-## 🧪 Step 3 — Automated Testing with Pytest
-
-**`tests/test_app.py`**
-```python
-from app import app
-
-def test_home():
-    client = app.test_client()
-    response = client.get("/")
-    assert response.status_code == 200
-```
-
-Run tests locally:
 ```bash
-pytest
+python3 app.py
 ```
 
-Expected output:
-```
-1 passed
-```
+Open:
 
----
-
-## 🐳 Step 4 — Docker Containerization
-
-The application is containerized using Docker to ensure consistent runtime environments across all machines.
-
-**`Dockerfile`**
-```dockerfile
-FROM python:3.10
-
-WORKDIR /app
-
-COPY . .
-
-RUN pip install -r requirements.txt
-
-EXPOSE 5000
-
-CMD ["python", "app.py"]
+```text
+http://127.0.0.1:5000
 ```
 
-Build the Docker image:
+Run tests:
+
 ```bash
-docker build -t gym-app .
+pytest -q
 ```
 
-Run the container:
-```bash
-docker run -p 5000:5000 gym-app
-```
+## Jenkins Pipeline
 
-The app will be accessible at `http://localhost:5000`.
+The committed `Jenkinsfile` converts the earlier Jenkins UI job into pipeline-as-code and adds part 2 stages:
 
----
-
-## ⚙️ Step 5 — GitHub Actions CI/CD
-
-**`.github/workflows/ci.yml`** automates the pipeline on every push.
-
-Pipeline tasks:
-1. Checkout repository
-2. Set up Python environment
+1. Checkout source
+2. Create Python virtual environment
 3. Install dependencies
-4. Run tests with Pytest
-5. Build Docker image
+4. Run Pytest with JUnit output
+5. Run SonarQube analysis
+6. Enforce quality gate
+7. Build Docker image
+8. Push image to Docker Hub
+9. Deploy rolling update to Kubernetes
 
-This ensures every code push is **automatically validated** before merging.
+Expected Jenkins credentials and tools:
 
----
+- Sonar scanner tool named `sonar-scanner`
+- SonarQube server named `SonarQube`
+- Docker Hub credentials id `dockerhub-credentials`
+- Kubernetes kubeconfig file credentials id `kubeconfig`
 
-## 🤖 Step 6 — Jenkins Continuous Integration
+## Docker
 
-Jenkins is used to create a CI pipeline connected to the GitHub repository.
+Build locally:
 
-Jenkins pipeline tasks:
-1. Pull latest code from GitHub
-2. Install Python dependencies
-3. Run automated tests
-4. Build Docker image
+```bash
+docker build -t aceest-fitness-gym:local .
+```
 
----
+Run locally:
 
-## ✅ CI/CD Benefits
+```bash
+docker run -p 5000:5000 aceest-fitness-gym:local
+```
 
-| Benefit | Description |
-|---|---|
-| Automated Testing | Tests run on every push — no manual effort needed |
-| Continuous Integration | Code is validated before it reaches production |
-| Faster Feedback | Developers are notified of failures immediately |
-| Consistent Environments | Docker ensures the app runs the same everywhere |
-| Improved Reliability | Automated pipelines reduce human error |
+The container uses `gunicorn` to serve the Flask application on port `5000`.
 
----
+## Kubernetes Deployment Strategies
 
-## 📄 License
+The `k8s/` directory contains example manifests for:
 
-This project was created for academic purposes as part of a DevOps coursework assignment.
+- Rolling Update
+- Blue-Green Deployment
+- Canary Release
+- Shadow Deployment
+- A/B Testing
+
+Before applying manifests, replace the placeholder image:
+
+```text
+your-dockerhub-user/aceest-fitness-gym:<tag>
+```
+
+Apply the rolling deployment example:
+
+```bash
+kubectl apply -f k8s/rolling/deployment.yaml
+```
+
+## SonarQube
+
+Static analysis is configured through `sonar-project.properties`. The Jenkins pipeline runs `sonar-scanner` and waits for the quality gate before continuing to image publishing and deployment.
+
+## Assignment Evidence To Collect
+
+For final submission, capture:
+
+- GitHub repository link
+- Jenkins pipeline success screenshots
+- SonarQube project report screenshot
+- Docker Hub repository with tagged images
+- Minikube or cluster endpoint URL
+- screenshots or notes showing each deployment strategy
+- short architecture report describing the CI/CD flow and key challenges
