@@ -71,14 +71,24 @@ pipeline {
         stage("Push Docker Image") {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                    sh """
+                    sh '''
                         set -eu
-                        echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                         docker push ${IMAGE_NAME}:${BUILD_NUMBER}
                         docker push ${IMAGE_NAME}:latest
                         docker logout
-                    """
+                    '''
                 }
+            }
+        }
+
+        stage("Load Image Into Minikube") {
+            steps {
+                sh """
+                    set -eu
+                    minikube image load ${IMAGE_NAME}:${BUILD_NUMBER}
+                    minikube image load ${IMAGE_NAME}:latest
+                """
             }
         }
 
@@ -89,7 +99,7 @@ pipeline {
                         set -eu
                         kubectl apply -f k8s/rolling/deployment.yaml
                         kubectl set image deployment/aceest-fitness aceest-fitness=${IMAGE_NAME}:${BUILD_NUMBER}
-                        kubectl rollout status deployment/aceest-fitness --timeout=120s
+                        kubectl rollout status deployment/aceest-fitness --timeout=300s
                     """
                 }
             }

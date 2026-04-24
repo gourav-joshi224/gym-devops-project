@@ -22,7 +22,7 @@ spec:
       containers:
         - name: aceest-fitness
           image: gouravj224/aceest-fitness-gym:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
           readinessProbe:
