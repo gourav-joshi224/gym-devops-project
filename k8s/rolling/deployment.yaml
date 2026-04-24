@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: aceest-fitness
-          image: your-dockerhub-user/aceest-fitness-gym:latest
+          image: gouravj224/aceest-fitness-gym:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000

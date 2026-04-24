@@ -9,7 +9,7 @@ pipeline {
     environment {
         VENV_DIR = ".venv"
         SONAR_SCANNER_HOME = tool 'sonar-scanner'
-        IMAGE_NAME = "your-dockerhub-user/aceest-fitness-gym"
+        IMAGE_NAME = "gouravj224/aceest-fitness-gym"
     }
 
     stages {
@@ -22,6 +22,7 @@ pipeline {
         stage("Set Up Python Environment") {
             steps {
                 sh """
+                    set -eu
                     echo "Starting Jenkins build..."
                     python3 -m venv ${VENV_DIR}
                     . ${VENV_DIR}/bin/activate
@@ -34,8 +35,9 @@ pipeline {
         stage("Run Pytest") {
             steps {
                 sh """
+                    set -eu
                     . ${VENV_DIR}/bin/activate
-                    pytest -q --junitxml=pytest.xml
+                    python -m pytest -q --junitxml=pytest.xml
                 """
             }
         }
@@ -44,6 +46,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh """
+                        set -eu
                         . ${VENV_DIR}/bin/activate
                         ${SONAR_SCANNER_HOME}/bin/sonar-scanner
                     """
@@ -69,6 +72,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                     sh """
+                        set -eu
                         echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
                         docker push ${IMAGE_NAME}:${BUILD_NUMBER}
                         docker push ${IMAGE_NAME}:latest
@@ -82,6 +86,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh """
+                        set -eu
                         kubectl apply -f k8s/rolling/deployment.yaml
                         kubectl set image deployment/aceest-fitness aceest-fitness=${IMAGE_NAME}:${BUILD_NUMBER}
                         kubectl rollout status deployment/aceest-fitness --timeout=120s

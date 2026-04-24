@@ -11,7 +11,7 @@ This folder contains example manifests for the deployment strategies requested i
 Update the container image values before applying the manifests:
 
 ```bash
-your-dockerhub-user/aceest-fitness-gym:<tag>
+gouravj224/aceest-fitness-gym
 ```
 
 Ingress-based examples assume the NGINX ingress controller is installed in Minikube.

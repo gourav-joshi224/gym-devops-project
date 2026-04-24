@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: aceest-fitness
-          image: your-dockerhub-user/aceest-fitness-gym:v1
+          image: gouravj224/aceest-fitness-gym:v1
           ports:
             - containerPort: 5000
 ---
@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
         - name: aceest-fitness
-          image: your-dockerhub-user/aceest-fitness-gym:v2
+          image: gouravj224/aceest-fitness-gym:v2
           ports:
             - containerPort: 5000
 ---
