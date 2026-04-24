@@ -10,6 +10,8 @@ pipeline {
         VENV_DIR = ".venv"
         SONAR_SCANNER_HOME = tool 'sonar-scanner'
         IMAGE_NAME = "gouravj224/aceest-fitness-gym"
+        K8S_DEPLOYMENT = "aceest-fitness"
+        K8S_SELECTOR = "app=aceest-fitness"
     }
 
     stages {
@@ -82,24 +84,21 @@ pipeline {
             }
         }
 
-        stage("Load Image Into Minikube") {
-            steps {
-                sh """
-                    set -eu
-                    minikube image load ${IMAGE_NAME}:${BUILD_NUMBER}
-                    minikube image load ${IMAGE_NAME}:latest
-                """
-            }
-        }
-
         stage("Deploy Rolling Update to Kubernetes") {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh """
                         set -eu
+                        kubectl get nodes
                         kubectl apply -f k8s/rolling/deployment.yaml
-                        kubectl set image deployment/aceest-fitness aceest-fitness=${IMAGE_NAME}:${BUILD_NUMBER}
-                        kubectl rollout status deployment/aceest-fitness --timeout=300s
+                        kubectl set image deployment/${K8S_DEPLOYMENT} aceest-fitness=${IMAGE_NAME}:${BUILD_NUMBER}
+                        kubectl rollout status deployment/${K8S_DEPLOYMENT} --timeout=300s || {
+                            kubectl describe deployment/${K8S_DEPLOYMENT}
+                            kubectl describe pods -l ${K8S_SELECTOR}
+                            exit 1
+                        }
+                        kubectl get pods -l ${K8S_SELECTOR} -o wide
+                        kubectl get svc aceest-fitness-service
                     """
                 }
             }
