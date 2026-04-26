@@ -1,141 +1,108 @@
-# ACEest Fitness & Gym DevOps Pipeline
+# ACEest Fitness & Gym DevOps Assignment
 
-This repository contains the part 2 assignment implementation for ACEest Fitness & Gym. The project now uses a modular Flask web application backed by SQLite and is prepared for automated CI/CD delivery through Jenkins, SonarQube, Docker, and Kubernetes deployment strategies.
+This repository contains the CI/CD and Kubernetes deployment work for the ACEest Fitness & Gym Flask application.
 
-## Current Application Scope
+Repository:
+`https://github.com/gourav-joshi224/gym-devops-project`
 
-The web application covers the core gym-management flow needed for the assignment:
+Working branch used for the assignment:
+`assignment-part2`
 
-- dashboard with client and workout overview
-- client registration workflow
-- client profile page
-- workout logging per client
-- SQLite-backed persistence through a reusable Flask app factory
+## Assignment Scope
 
-## Project Structure
+The project includes:
 
-```text
-gym-devops-project/
-├── aceest_app/
-│   ├── __init__.py
-│   ├── db.py
-│   ├── routes.py
-│   ├── schema.sql
-│   └── templates/
-├── tests/
-│   └── test_app.py
-├── k8s/
-│   ├── rolling/
-│   ├── blue-green/
-│   ├── canary/
-│   ├── shadow/
-│   └── ab-testing/
-├── Jenkinsfile
-├── Dockerfile
-├── sonar-project.properties
-├── requirements.txt
-└── app.py
-```
+- Flask application source code
+- Pytest-based test cases
+- Jenkins pipeline as code in `Jenkinsfile`
+- SonarQube scan configuration
+- Docker image build and push workflow
+- Kubernetes manifests for multiple deployment strategies
 
-## Local Development
+## Project Files
 
-Install dependencies:
+Main assignment files:
 
-```bash
-python3 -m venv .venv
-. .venv/bin/activate
-pip install -r requirements.txt
-```
+- `app.py`
+- `aceest_app/`
+- `tests/test_app.py`
+- `Jenkinsfile`
+- `Dockerfile`
+- `sonar-project.properties`
+- `k8s/rolling/deployment.yaml`
+- `k8s/canary/deployment.yaml`
+- `k8s/blue-green/deployment-blue.yaml`
+- `k8s/shadow/deployment.yaml`
+- `k8s/ab-testing/deployment.yaml`
 
-Run the Flask application:
+## CI/CD Pipeline
 
-```bash
-python3 app.py
-```
+The Jenkins pipeline performs these stages:
 
-Open:
-
-```text
-http://127.0.0.1:5000
-```
-
-Run tests:
-
-```bash
-pytest -q
-```
-
-## Jenkins Pipeline
-
-The committed `Jenkinsfile` converts the earlier Jenkins UI job into pipeline-as-code and adds part 2 stages:
-
-1. Checkout source
+1. Checkout source from GitHub
 2. Create Python virtual environment
-3. Install dependencies
-4. Run Pytest with JUnit output
+3. Install dependencies from `requirements.txt`
+4. Run Pytest and generate `pytest.xml`
 5. Run SonarQube analysis
-6. Enforce quality gate
+6. Enforce SonarQube quality gate
 7. Build Docker image
-8. Push image to Docker Hub
+8. Push Docker image to Docker Hub
 9. Deploy rolling update to Kubernetes
 
-Expected Jenkins credentials and tools:
+Docker image used by the pipeline:
 
-- Sonar scanner tool named `sonar-scanner`
-- SonarQube server named `SonarQube`
-- Docker Hub credentials id `dockerhub-credentials`
-- Kubernetes kubeconfig file credentials id `kubeconfig`
+`gouravj224/aceest-fitness-gym`
 
-## Docker
+## Jenkins Configuration Used
 
-Build locally:
+The pipeline expects the following Jenkins setup:
 
-```bash
-docker build -t aceest-fitness-gym:local .
-```
-
-Run locally:
-
-```bash
-docker run -p 5000:5000 aceest-fitness-gym:local
-```
-
-The container uses `gunicorn` to serve the Flask application on port `5000`.
-
-## Kubernetes Deployment Strategies
-
-The `k8s/` directory contains example manifests for:
-
-- Rolling Update
-- Blue-Green Deployment
-- Canary Release
-- Shadow Deployment
-- A/B Testing
-
-Before applying manifests, replace the placeholder image:
-
-```text
-your-dockerhub-user/aceest-fitness-gym:<tag>
-```
-
-Apply the rolling deployment example:
-
-```bash
-kubectl apply -f k8s/rolling/deployment.yaml
-```
+- SonarQube server name: `SonarQube`
+- Sonar scanner tool name: `sonar-scanner`
+- Docker Hub credentials id: `dockerhub-credentials`
+- Kubernetes file credential id: `kubeconfig`
 
 ## SonarQube
 
-Static analysis is configured through `sonar-project.properties`. The Jenkins pipeline runs `sonar-scanner` and waits for the quality gate before continuing to image publishing and deployment.
+Static analysis is configured through `sonar-project.properties`.
 
-## Assignment Evidence To Collect
+Project values:
 
-For final submission, capture:
+- Project key: `aceest-fitness-gym`
+- Project name: `ACEest Fitness & Gym`
+- Python version: `3.12`
 
+## Docker
+
+The project is containerized using the provided `Dockerfile`.
+
+Pipeline image tags include:
+
+- Jenkins build number
+- `latest`
+
+## Kubernetes Deployment Strategies
+
+The `k8s/` folder contains manifests for:
+
+- Rolling update
+- Canary deployment
+- Blue-green deployment
+- Shadow deployment
+- A/B testing
+
+The Jenkins pipeline currently deploys using:
+
+- `k8s/rolling/deployment.yaml`
+
+## Submission Notes
+
+For assignment submission, include:
+
+- project source folder
 - GitHub repository link
-- Jenkins pipeline success screenshots
-- SonarQube project report screenshot
-- Docker Hub repository with tagged images
-- Minikube or cluster endpoint URL
-- screenshots or notes showing each deployment strategy
-- short architecture report describing the CI/CD flow and key challenges
+- Jenkins pipeline evidence
+- SonarQube quality gate/report evidence
+- Docker Hub tags evidence
+- Kubernetes deployment evidence
+- short project report
