@@ -7,7 +7,7 @@ Repository:
 
 Working branch used for the assignment:
 `assignment-part2`
-
+ 
 ## Assignment Scope
 
 The project includes:
